@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contextual QA Master</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <h2>Mentor Text</h2>
+            <textarea id="mentorText" placeholder="Paste your article or story here..."></textarea>
+            <button id="generateBtn">Generate Question</button>
+        </aside>
+
+        <main class="workspace">
+            <div id="loading" class="hidden">Generating your challenge...</div>
+            
+            <section id="questionArea" class="hidden">
+                <div class="card">
+                    <h3>The Challenge</h3>
+                    <p id="displayQuestion"></p>
+                </div>
+                
+                <div class="card">
+                    <h3>Your Answer</h3>
+                    <textarea id="userAnswer" placeholder="Type your response here..."></textarea>
+                    <button id="submitBtn">Submit for Feedback</button>
+                </div>
+            </section>
+
+            <section id="feedbackArea" class="hidden">
+                <div class="card feedback-card">
+                    <h3>Teacher's Feedback</h3>
+                    <div id="feedbackContent"></div>
+                    <button onclick="location.reload()">Try Another Text</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
