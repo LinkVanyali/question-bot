@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="loginOverlay" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 50;">
+    <div style="background: white; padding: 2rem; border-radius: 8px; text-align: center;">
+        <h2>Welcome! Enter your name:</h2>
+        <input type="text" id="usernameInput" style="padding: 0.5rem; margin: 1rem 0; width: 80%;" placeholder="e.g. Sarah Connor">
+        <br>
+        <button id="loginBtn" style="background: #4f46e5; color: white; padding: 0.5rem 1rem;">Start Studying</button>
+    </div>
+    </div>
     <div class="app-container">
         <aside class="sidebar">
             <h2>Mentor Text</h2>
