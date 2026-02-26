@@ -1,86 +1,70 @@
-// State management to keep track of the secret answer locally in the browser's memory
-let currentQuestionData = {
-    question: "",
-    model_answer: "",
-    focus_points: []
-};
+// --- 1. LOGIN & USER TRACKING ---
+let currentUsername = localStorage.getItem('qa_username');
 
-// 1. Generate Question Logic
+// Check for the user on page load
+window.addEventListener('load', () => {
+    const overlay = document.getElementById('loginOverlay');
+    if (!currentUsername && overlay) {
+        overlay.classList.remove('hidden');
+        overlay.style.display = 'flex'; // Ensures the flexbox layout works
+    } else if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.style.display = 'none';
+    }
+});
+
+// Handle the Login Button click
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            const name = document.getElementById('usernameInput').value.trim();
+            if (name) {
+                // Save to browser memory
+                localStorage.setItem('qa_username', name);
+                currentUsername = name;
+                // Hide the overlay
+                const overlay = document.getElementById('loginOverlay');
+                overlay.classList.add('hidden');
+                overlay.style.display = 'none';
+            } else {
+                alert("Please enter a name to continue!");
+            }
+        });
+    }
+});
+
+// --- 2. APP STATE (BATCH QUESTION TRACKING) ---
+let questionsArray = [];
+let currentQuestionIndex = 0;
+let savedMentorText = ""; // Locks in the text so they can't change it mid-quiz
+
+// --- 3. GENERATE QUESTIONS LOGIC ---
 document.getElementById('generateBtn').addEventListener('click', async () => {
-    const mentorText = document.getElementById('mentorText').value;
-    if (!mentorText) return alert("Please paste some text first!");
+    const mentorTextInput = document.getElementById('mentorText').value;
+    if (!mentorTextInput) return alert("Please paste some text first!");
 
+    savedMentorText = mentorTextInput; // Lock the text into state
     toggleLoading(true);
 
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
             body: JSON.stringify({ 
-                mentorText: mentorText, 
+                mentorText: savedMentorText, 
                 mode: "generate" 
             })
         });
 
         const data = await response.json();
         
-        // Store the AI's response in our state
-        currentQuestionData = data;
-
-        // Update UI
-        document.getElementById('displayQuestion').innerText = data.question;
-        document.getElementById('questionArea').classList.remove('hidden');
-        document.getElementById('feedbackArea').classList.add('hidden');
-    } catch (error) {
-        alert("Error generating question. Check your API key!");
-    } finally {
-        toggleLoading(false);
-    }
-});
-
-// 2. Submit Answer Logic
-document.getElementById('submitBtn').addEventListener('click', async () => {
-    const userResponse = document.getElementById('userAnswer').value;
-    const mentorText = document.getElementById('mentorText').value;
-
-    if (!userResponse) return alert("Write an answer first!");
-
-    toggleLoading(true);
-
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            body: JSON.stringify({
-                mode: "evaluate",
-                mentorText: mentorText,
-                question: currentQuestionData.question,
-                modelAnswer: currentQuestionData.model_answer,
-                userResponse: userResponse
-            })
-        });
-
-        const feedback = await response.json();
-
-        // Build the feedback HTML
-        document.getElementById('feedbackContent').innerHTML = `
-            <div class="score">Score: ${feedback.score}%</div>
-            <p><strong>Strengths:</strong> ${feedback.strengths}</p>
-            <p><strong>Gaps:</strong> ${feedback.gaps}</p>
-            <div class="refined">
-                <strong>Try it like this:</strong><br>
-                <em>${feedback.refined_version}</em>
-            </div>
-        `;
-        
-        document.getElementById('feedbackArea').classList.remove('hidden');
-    } catch (error) {
-        alert("Error getting feedback.");
-    } finally {
-        toggleLoading(false);
-    }
-});
-
-// Helper function to show/hide loading state
-function toggleLoading(isLoading) {
-    const loader = document.getElementById('loading');
-    loader.classList.toggle('hidden', !isLoading);
-}
+        // Our backend prompt forces exactly this JSON structure: { "questions": [...] }
+        if (data.questions && data.questions.length > 0) {
+            questionsArray = data.questions;
+            currentQuestionIndex = 0;
+            
+            // Load the first question into the UI
+            showCurrentQuestion();
+            
+            // Show the question area
+            document.getElementById
