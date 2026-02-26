@@ -2,7 +2,7 @@
   "name": "contextual-qa-app",
   "version": "1.0.0",
   "dependencies": {
-    "@google/genai": "^1.0.0"
+    "@google/genai": "^1.0.0",
     "@supabase/supabase-js": "^2.39.0"
   }
 }
