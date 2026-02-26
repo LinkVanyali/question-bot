@@ -1,4 +1,4 @@
-// --- 1. LOGIN & USER TRACKING ---
+// --- 1. LOGIN & USER TRACKING --- 
 let currentUsername = localStorage.getItem('qa_username');
 
 // Check for the user on page load
